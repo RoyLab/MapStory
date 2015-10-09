@@ -1,0 +1,9 @@
+.sencha/*
+build/
+packages/
+sass/
+touch/
+cordova/hooks/*
+cordova/platforms/*
+cordova/plugins/*
+cordova/www/*
