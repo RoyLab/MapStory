@@ -72,7 +72,7 @@
      */
     "css": [
         {
-            "path": "resources/css/app.css",
+            "path": "resources/css/cupertino.css",
             "update": "delta"
         }
     ],
@@ -103,6 +103,8 @@
      * Extra resources to be copied along when build
      */
     "resources": [
+        "cordova/config.xml",
+        "resources/mp3",
         "resources/images",
         "resources/icons",
         "resources/startup"
@@ -131,5 +133,18 @@
      * Uniquely generated id for this application, used as prefix for localStorage keys.
      * Normally you should never change this value.
      */
-    "id": "6c1075cd-3b31-4cee-82b1-9556a7f9e246"
+    "id": "6c1075cd-3b31-4cee-82b1-9556a7f9e246",
+
+    "builds": {
+        "native": {
+            "packager": "cordova",
+            "cordova" : {
+                "config": {
+                    "platforms": "android",
+                    "id": "com.domain.MapStory",
+                    "name": "MapStory"
+                }
+            }
+        }
+    }
 }
