@@ -3,6 +3,7 @@ Ext.define('MapStory.view.Main', {
     xtype: 'main',
     requires: [
         'Ext.TitleBar',
+        'MapStory.view.MiniPlayer'
     ],
     config: {
 
@@ -16,15 +17,15 @@ Ext.define('MapStory.view.Main', {
 
             items: [
             {
-                xtype:'button',
-                text:'No one answer.'
+                xtype:'component',
+                flex:0
             },
-            /*{
-                xtype:'dtplayer',
+            {
+                xtype:'miniplayer',
                 docked:'bottom',
                 flex:1
             },
-            {
+            /*{
                 xtype:'panel',
                 id:'allmap',
                 flex:1
