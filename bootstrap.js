@@ -658,7 +658,11 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.viewport.WindowsPhone": [
     "Ext.viewport.WP"
   ],
-  "MapStory.view.Main": []
+  "MapStory.Config": [],
+  "MapStory.controller.Map": [],
+  "MapStory.view.Main": [],
+  "MapStory.view.MiniPlayer": [],
+  "MapStory.view.Player": []
 });
 
 Ext.ClassManager.addNameAliasMappings({
@@ -1376,7 +1380,15 @@ Ext.ClassManager.addNameAliasMappings({
   "Ext.viewport.Ios": [],
   "Ext.viewport.Viewport": [],
   "Ext.viewport.WindowsPhone": [],
+  "MapStory.Config": [],
+  "MapStory.controller.Map": [],
   "MapStory.view.Main": [
+    "widget.main"
+  ],
+  "MapStory.view.MiniPlayer": [
+    "widget.miniplayer"
+  ],
+  "MapStory.view.Player": [
     "widget.main"
   ]
 });

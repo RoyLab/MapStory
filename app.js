@@ -14,12 +14,17 @@ Ext.application({
     name: 'MapStory',
 
     requires: [
-        'Ext.MessageBox'
+        'Ext.MessageBox',
+        'MapStory.Config'
     ],
 
     views: [
         'Main',
         'Player'
+    ],
+
+    controllers:[
+        'Map'
     ],
 
     icon: {

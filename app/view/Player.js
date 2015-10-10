@@ -24,19 +24,13 @@ Ext.define('MapStory.view.Player', {
             flex:1,
             items:[{
                 xtype:'image',
-                layout:'fill',
                 src:'resources/images/album.jpg',
 
             },
             {
                 xtype:'image',
-                layout:'fill',
                 src:'resources/images/album2.jpg',
             }]
-        },
-        {
-            xtype:'button',
-            text:'fdafdfasd'
         }]
 
     }
