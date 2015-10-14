@@ -4,9 +4,10 @@ Ext.define('MapStory.controller.Map',{
 
 	config:{
 
-        position: new AMap.LngLat(121.436305,31.025227),
+        initPosition: new AMap.LngLat(121.436305,31.025227),
         searchOptions:{orderBy: '_id:ASC'},
         searchPlugin:null,
+        geolocationPlugin:null,
         geoResult:null,
         marker:null
 	},
@@ -26,7 +27,7 @@ Ext.define('MapStory.controller.Map',{
 
         this.mapview = new AMap.Map(MapStory.Config.getMapId(), {
             view: new AMap.View2D({//创建地图二维视口
-              center:this.getPosition(),//创建中心点坐标
+              center:this.getInitPosition(),//创建中心点坐标
               zoom:16, //设置地图缩放级别
              }),
           	zooms:[15, 17],
@@ -44,9 +45,11 @@ Ext.define('MapStory.controller.Map',{
 
 	createGeolocationPlugin: function(mapview){
 		
+        var caller = this;
+
         this.setMarker(new AMap.Marker({
             map:mapview,
-            position:this.getPosition(),//基点位置                 
+            position:this.getInitPosition(),//基点位置                 
             offset:new AMap.Pixel(-12,-11),//相对于基点的偏移位置
             icon:"resources/images/arrow_icon2.png",
             angle:-90
@@ -54,7 +57,7 @@ Ext.define('MapStory.controller.Map',{
 
         mapview.plugin('AMap.Geolocation', function () {
 
-            geolocation = new AMap.Geolocation({
+            var geolocation = new AMap.Geolocation({
                 enableHighAccuracy: true,//是否使用高精度定位，默认:true
                 timeout: 10000,          //超过10秒后停止定位，默认：无穷大
                 maximumAge: 0,           //定位结果缓存0毫秒，默认：0
@@ -67,6 +70,7 @@ Ext.define('MapStory.controller.Map',{
                 panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
                 zoomToAccuracy:false      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
             });
+            caller.setGeolocationPlugin(geolocation);
             mapview.addControl(geolocation);
             geolocation.watchPosition();
 
@@ -84,7 +88,6 @@ Ext.define('MapStory.controller.Map',{
 
                     var mapCtrl = MapStory.app.getController('Map');
                     mapCtrl.onGeolocationSuccess(data);
-                    mapCtrl.cloudSearchCallback(data);
                 }
             );//返回定位信息
 

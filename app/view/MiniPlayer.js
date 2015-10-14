@@ -9,6 +9,7 @@ Ext.define('MapStory.view.MiniPlayer', {
     config: {
 
         // recommended height: 75
+        id:MapStory.Config.getMiniPlayerId(),
 
         layout:{
             type:'hbox',
@@ -51,7 +52,7 @@ Ext.define('MapStory.view.MiniPlayer', {
 
             listeners:{
                 tap: function() {
-                        Ext.getCmp('mainview').push(Ext.create('MapStory.view.Player'));
+                    Ext.getCmp('mainview').push(Ext.create('MapStory.view.Player'));
                 }
             }
         },
@@ -79,6 +80,7 @@ Ext.define('MapStory.view.MiniPlayer', {
         {
             xtype:'image',
             src:'resources/images/stop.png',
+            id:'playButton',
             width:50,
             height:50,
         },

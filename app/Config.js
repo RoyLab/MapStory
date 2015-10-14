@@ -5,7 +5,8 @@ Ext.define('MapStory.Config', {
   
     config : {  
         website:'http://londit-50c03e41547f8.com.1130.url-test.com',
-        mapId:'mapview'
+        mapId:'mapview',
+        miniPlayerId:'mplayer'
     },
 
     constructor : function(config) {  
