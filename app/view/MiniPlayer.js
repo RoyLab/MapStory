@@ -33,6 +33,7 @@ Ext.define('MapStory.view.MiniPlayer', {
 
             items:[{
                 xtype:'component',
+                itemId:'used',
                 style:'background:#459ffa',
                 height:3,
                 flex:16
@@ -66,12 +67,14 @@ Ext.define('MapStory.view.MiniPlayer', {
 
             items:[{
                 xtype:'label',
+                id:'_mp_mainTitle',
                 style:'background:#transparent;font-family: monospace;font-size:1.4em',
                 margin:'0 0 7 0',
                 html:'暂无广播曲目'              
             },
             {
                 xtype:'label',
+                id:'_mp_secondaryTitle',
                 style:'background:#transparent;font-family: monospace;font-size:1.0em',
                 html:'未知地点'           
             }]
@@ -80,13 +83,22 @@ Ext.define('MapStory.view.MiniPlayer', {
         {
             xtype:'image',
             src:'resources/images/stop.png',
-            id:'playButton',
+            id:'_mn_playButton',
             width:50,
-            height:50,
+            height:50, 
         },
         {
             xtype:'spacer',
             width:20
         }]
-    }
+    },
+
+
+    start:function(){
+        Ext.getCmp('_mn_playButton').setSrc('resources/images/start.png');  
+    },
+
+    stop:function(){
+        Ext.getCmp('_mn_playButton').setSrc('resources/images/stop.png');  
+    }           
 });

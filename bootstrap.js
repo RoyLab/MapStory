@@ -659,6 +659,7 @@ Ext.ClassManager.addNameAlternateMappings({
     "Ext.viewport.WP"
   ],
   "MapStory.Config": [],
+  "MapStory.controller.Audio": [],
   "MapStory.controller.Map": [],
   "MapStory.view.Main": [],
   "MapStory.view.MiniPlayer": [],
@@ -1381,6 +1382,7 @@ Ext.ClassManager.addNameAliasMappings({
   "Ext.viewport.Viewport": [],
   "Ext.viewport.WindowsPhone": [],
   "MapStory.Config": [],
+  "MapStory.controller.Audio": [],
   "MapStory.controller.Map": [],
   "MapStory.view.Main": [
     "widget.main"
