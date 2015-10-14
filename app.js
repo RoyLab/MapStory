@@ -24,7 +24,8 @@ Ext.application({
     ],
 
     controllers:[
-        'Map'
+        'Map',
+        'Audio'
     ],
 
     icon: {

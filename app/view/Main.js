@@ -25,7 +25,7 @@ Ext.define('MapStory.view.Main', {
                 {
                     xtype:'container',
                     style:'box-shadow:inset 1px 1px  6px #000; background:transparent; display: inline-block;',
-                    margin:15,
+                    margin:'15 17 16 15',
                 },
                 {
                     xtype:'container',
