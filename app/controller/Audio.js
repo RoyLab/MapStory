@@ -12,7 +12,8 @@ Ext.define('MapStory.controller.Audio',{
 
         refs:{
             player:'#'+MapStory.Config.getMiniPlayerId(),
-            playButton:'#_mn_playButton'
+            playButton:'#_mn_playButton',
+            slider:'#_mn_used'
         },
 
         isPlaying:0, // 0: stop, 1: playing, 2: pause
@@ -113,6 +114,7 @@ Ext.define('MapStory.controller.Audio',{
                 hidden:true,
                 listeners:{
                     ended:function(){
+                        caller.getSlider().setFlex(0);
                         clearInterval(timer);
                         caller.getPlayer().stop();
                     }
@@ -121,21 +123,25 @@ Ext.define('MapStory.controller.Audio',{
 
             if (caller.mp3player && loaded){
                 caller.mp3player.play();
+                caller.getPlayer().start();
                 timer = setInterval(updateSlider, 500);
             }
         }
 
         function updateSlider(){
 
-           /* if (caller.webPlayer){
-                caller.setValue(100*caller.mp3player.getCurrentTime()/caller.getALength());
+            function convert(value){
+                return value / (1-value);
+            }
+
+            if (typeof Media != 'undefined'){
+                caller.mp3player.getCurrentPosition(function(t){
+                    caller.getSlider().setFlex(convert(t/caller.getALength()));
+                });
             }
             else{
-                var time = 0;
-                caller.mp3player.getCurrentPosition(function(t){
-                    caller.setValue(100*t/caller.getALength());
-                });
-            }*/
+                caller.getSlider().setFlex(convert(caller.mp3player.getCurrentTime()/caller.getALength()));
+            }
         }
     },
 

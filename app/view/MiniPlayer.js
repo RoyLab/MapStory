@@ -33,16 +33,16 @@ Ext.define('MapStory.view.MiniPlayer', {
 
             items:[{
                 xtype:'component',
-                itemId:'used',
+                id:'_mn_used',
                 style:'background:#459ffa',
                 height:3,
-                flex:16
+                flex:0
             },
             {
                 xtype:'component',
                 style:'background:#fff',
                 height:3,
-                flex:39
+                flex:1
             }]
         },
         {
