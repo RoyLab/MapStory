@@ -32,10 +32,11 @@ Ext.define('MapStory.controller.Audio',{
 
         var caller = this;
 
-        setTimeout(function(){
+        // for test only
+        /*setTimeout(function(){
             caller.setAChanged(true);
             caller.setATitle('第二首曲子');
-        }, 10000);
+        }, 10000);*/
 	},
 
     playAndStop:function(){

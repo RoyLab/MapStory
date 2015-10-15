@@ -39,6 +39,7 @@ Ext.define('MapStory.controller.Map',{
         	ne = new AMap.LngLat(121.452398,31.034954);
         //mapview.setLimitBounds(new AMap.Bounds(sw,ne));
 
+        this.createCloudLayer(mapview);
         this.createGeolocationPlugin(mapview);
         this.createCloudSearchPlugin(mapview);
 	},
@@ -96,10 +97,40 @@ Ext.define('MapStory.controller.Map',{
                     console.warn('定位失败');
         	});
         });
+
+        if (navigator.compass){
+            navigator.compass.watchHeading(function(heading){
+                caller.getMarker().setRotation(heading.magneticHeading-90);
+            }, null);
+        }
 	},
 
+    createCloudLayer: function(mapview){
 
-    createCloudSearchPlugin: function(data){
+        mapview.plugin('AMap.CloudDataLayer', function() {
+            var layerOptions = { 
+                //query:{keywords: '三'},
+                clickable:true
+            };
+            var cloudDataLayer = new AMap.CloudDataLayer('55e433fce4b02580c5f3037c', layerOptions); //实例化云图层类
+            cloudDataLayer.setMap(mapview); //叠加云图层到地图
+
+            AMap.event.addListener(cloudDataLayer, 'click', function (result) {
+                var clouddata = result.data;
+                var infoWindow = new AMap.InfoWindow({
+                    content:"<h3><font face=\"微软雅黑\"color=\"#3366FF\">"+ clouddata._name +"</font></h3><hr />地址："+ clouddata._address + "<br />",
+                    size:new AMap.Size(300, 0),
+                    autoMove:true,
+                    offset:new AMap.Pixel(0,-25)
+                });
+            
+                infoWindow.open(mapview, clouddata._location);
+            });
+        });
+    },
+
+
+    createCloudSearchPlugin: function(mapview){
 
         AMap.service(["AMap.CloudDataSearch"], function(){
             var mapCtrl = MapStory.app.getController('Map');
