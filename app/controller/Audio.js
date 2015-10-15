@@ -17,7 +17,7 @@ Ext.define('MapStory.controller.Audio',{
 
         isPlaying:0, // 0: stop
         aLength:14,
-        aContent:'/android_asset/www/resources/mp3/welcome.mp3'
+        aContent:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3'
 	},
 
 	launch: function(app){
@@ -26,7 +26,6 @@ Ext.define('MapStory.controller.Audio',{
 
     playAndStop:function(){
 
-        k = this.getPlayButton();
         if (!this.getIsPlaying()){
             this.setIsPlaying(true);
             this.getPlayer().start();
