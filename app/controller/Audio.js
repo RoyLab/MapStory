@@ -18,7 +18,10 @@ Ext.define('MapStory.controller.Audio',{
 
         isPlaying:0, // 0: stop, 1: playing, 2: pause
         aLength:14,
-        aContent:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3'
+        aContent:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3',
+        aTitle:'关于地图故事',
+        aLocation:'上海交通大学闵行校区',
+        aChanged:true,
 	},
 
     STAT_STOP:0,
@@ -27,6 +30,12 @@ Ext.define('MapStory.controller.Audio',{
 
 	launch: function(app){
 
+        var caller = this;
+
+        setTimeout(function(){
+            caller.setAChanged(true);
+            caller.setATitle('第二首曲子');
+        }, 10000);
 	},
 
     playAndStop:function(){
@@ -34,7 +43,13 @@ Ext.define('MapStory.controller.Audio',{
         switch(this.getIsPlaying()){
 
         case this.STAT_STOP:
-            this.play(this.getAContent(), this.getALength());
+            if (this.getAChanged()){
+                this.play(this.getAContent(), this.getALength());
+                this.getPlayer().applyText(this.getATitle(), this.getALocation());
+                this.setAChanged(false);
+            } else{
+                this.restart();
+            }
             break;
         case this.STAT_PAUSE:
             this.resume();
@@ -56,7 +71,7 @@ Ext.define('MapStory.controller.Audio',{
     resume: function(){
         if (typeof Media != 'undefined'){
             this.mp3player.play();
-        }        
+        }
     },
 
 
@@ -66,6 +81,7 @@ Ext.define('MapStory.controller.Audio',{
             this.mp3player.play();
         }
     },
+
 
     play: function(fileName, length){
 
@@ -97,8 +113,15 @@ Ext.define('MapStory.controller.Audio',{
                     break;
                 case Media.MEDIA_STOPPED:
                     clearInterval(timer);
+                    caller.getSlider().setFlex(10000);
                     caller.getPlayer().stop();
                     caller.setIsPlaying(caller.STAT_STOP);
+
+                    if (caller.getAChanged()){
+                        setTimeout(function(){
+                            caller.playAndStop();
+                        }, 2000);                        
+                    }
                     break;
                 case Media.MEDIA_PAUSED:
                     clearInterval(timer);
@@ -114,7 +137,7 @@ Ext.define('MapStory.controller.Audio',{
                 hidden:true,
                 listeners:{
                     ended:function(){
-                        caller.getSlider().setFlex(0);
+                        caller.getSlider().setFlex(10000);
                         clearInterval(timer);
                         caller.getPlayer().stop();
                     }
@@ -131,7 +154,8 @@ Ext.define('MapStory.controller.Audio',{
         function updateSlider(){
 
             function convert(value){
-                return value / (1-value);
+                if (value >= 1.0) return 10000;
+                else return value / (1-value);
             }
 
             if (typeof Media != 'undefined'){

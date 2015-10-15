@@ -70,13 +70,13 @@ Ext.define('MapStory.view.MiniPlayer', {
                 id:'_mp_mainTitle',
                 style:'background:#transparent;font-family: monospace;font-size:1.4em',
                 margin:'0 0 7 0',
-                html:'暂无广播曲目'              
+                html:'关于地图故事'              
             },
             {
                 xtype:'label',
-                id:'_mp_secondaryTitle',
+                id:'_mp_location',
                 style:'background:#transparent;font-family: monospace;font-size:1.0em',
-                html:'未知地点'           
+                html:'上海交通大学闵行校区'           
             }]
         },
         {xtype:'spacer'},
@@ -99,6 +99,11 @@ Ext.define('MapStory.view.MiniPlayer', {
     },
 
     stop:function(){
-        Ext.getCmp('_mn_playButton').setSrc('resources/images/stop.png');  
-    }           
+        Ext.getCmp('_mn_playButton').setSrc('resources/images/stop.png');
+    },
+
+    applyText:function(title, location){
+        Ext.getCmp('_mp_mainTitle').setHtml(title);
+        Ext.getCmp('_mp_location').setHtml(location);
+    }
 });
