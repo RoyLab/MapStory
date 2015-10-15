@@ -15,10 +15,14 @@ Ext.define('MapStory.controller.Audio',{
             playButton:'#_mn_playButton'
         },
 
-        isPlaying:0, // 0: stop
+        isPlaying:0, // 0: stop, 1: playing, 2: pause
         aLength:14,
         aContent:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3'
 	},
+
+    STAT_STOP:0,
+    STAT_PAUSE:1,
+    STAT_PLAYING:2,
 
 	launch: function(app){
 
@@ -26,32 +30,84 @@ Ext.define('MapStory.controller.Audio',{
 
     playAndStop:function(){
 
-        if (!this.getIsPlaying()){
-            this.setIsPlaying(true);
-            this.getPlayer().start();
+        switch(this.getIsPlaying()){
+
+        case this.STAT_STOP:
             this.play(this.getAContent(), this.getALength());
-        } else{
-            this.setIsPlaying(false);
-            this.getPlayer().stop();
+            break;
+        case this.STAT_PAUSE:
+            this.resume();
+            break;
+        case this.STAT_PLAYING:
+            this.pause();
+            break;
         }
 
+    },
+
+
+    pause: function(){
+        if (typeof Media != 'undefined'){
+            this.mp3player.pause();
+        }
+    },
+
+    resume: function(){
+        if (typeof Media != 'undefined'){
+            this.mp3player.play();
+        }        
+    },
+
+
+    restart: function(){
+        if (typeof Media != 'undefined'){
+            this.mp3player.seekTo(0);
+            this.mp3player.play();
+        }
     },
 
     play: function(fileName, length){
 
         var caller = this,
-            loaded = true;
-
-        caller.setALength(length);
+            loaded = true,
+            timer = null;
 
         if (typeof Media != 'undefined'){
+
+            // do some clean
             if (caller.mp3player){
                 caller.mp3player.release();
             }
+            caller.setIsPlaying(caller.STAT_STOP);
             caller.mp3player = new Media(fileName, null, onMediaError, onMediaStatusChanged);
+            caller.mp3player.play();
+
+            function onMediaError(e){
+                alert('Error: '+e.code+', fileName: '+fileName);
+            };
+
+            function onMediaStatusChanged(newStatus){
+
+                switch(newStatus){
+                case Media.MEDIA_RUNNING:
+                    timer = setInterval(updateSlider, 500);
+                    caller.getPlayer().start();
+                    caller.setIsPlaying(caller.STAT_PLAYING);
+                    break;
+                case Media.MEDIA_STOPPED:
+                    clearInterval(timer);
+                    caller.getPlayer().stop();
+                    caller.setIsPlaying(caller.STAT_STOP);
+                    break;
+                case Media.MEDIA_PAUSED:
+                    clearInterval(timer);
+                    caller.getPlayer().stop();
+                    caller.setIsPlaying(caller.STAT_PAUSE);
+                    break;
+                }
+            };
         }else{
-            console.error('No Media support found.')
-            caller.webPlayer = true;
+            console.warn('No Media support found.')
             caller.mp3player = Ext.create('Ext.Audio',{
                 url:fileName,
                 hidden:true,
@@ -62,26 +118,12 @@ Ext.define('MapStory.controller.Audio',{
                     }
                 }
             });
-        }
 
-        if (caller.mp3player && loaded){
-            caller.mp3player.play();
-            var timer = setInterval(updateSlider, 500);
-        }
-
-        function onMediaError(e){
-            loaded = false;
-            caller.mp3player = null;
-            caller.getPlayer().stop();
-            alert('Error: '+ e.code);
-        };
-
-        function onMediaStatusChanged(newStatus){
-            if (newStatus == Media.MEDIA_STOPPED){
-                clearInterval(timer);
-                caller.getPlayer().stop();
+            if (caller.mp3player && loaded){
+                caller.mp3player.play();
+                timer = setInterval(updateSlider, 500);
             }
-        };
+        }
 
         function updateSlider(){
 
