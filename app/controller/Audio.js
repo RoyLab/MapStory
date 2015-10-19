@@ -16,12 +16,26 @@ Ext.define('MapStory.controller.Audio',{
             slider:'#_mn_used'
         },
 
-        isPlaying:0, // 0: stop, 1: playing, 2: pause
-        aLength:14,
-        aContent:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3',
-        aTitle:'关于地图故事',
-        aLocation:'上海交通大学闵行校区',
-        aChanged:true,
+
+        currentAudio:{
+            isPlaying:0,
+            url:'',
+            duration:-1,
+            id:-1,
+            title:'',
+            location:'',
+        },
+
+        nextAudio:{
+            url:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3',
+            duration:14,
+            id:-1,
+            title:'关于地图故事',
+            location:'上海交通大学',
+            status:2, // 0 not request, 1 requesting, 2 received
+        },
+
+        audioExpiredTime:20000 // nextAudio will be stored for [audioExpiredTime] ms
 	},
 
     STAT_STOP:0,
@@ -41,15 +55,18 @@ Ext.define('MapStory.controller.Audio',{
 
     playAndStop:function(){
 
-        switch(this.getIsPlaying()){
+        switch(this.getCurrentAudio().isPlaying){
 
         case this.STAT_STOP:
-            if (this.getAChanged()){
-                this.play(this.getAContent(), this.getALength());
-                this.getPlayer().applyText(this.getATitle(), this.getALocation());
-                this.setAChanged(false);
+            if (this.getNextAudio().status == 2){
+                this.helper.copySettings(this.getCurrentAudio(), this.getNextAudio());
+                this.updateUI();
+                this.play(this.getCurrentAudio().url, this.getCurrentAudio().duration);
+                this.getNextAudio().status = 0;
+                clearTimeout(this.audioExpiredTimeout);
             } else{
                 this.restart();
+                // 弹出提示框
             }
             break;
         case this.STAT_PAUSE:
@@ -83,6 +100,9 @@ Ext.define('MapStory.controller.Audio',{
         }
     },
 
+    updateUI: function(){
+        this.getPlayer().applyText(this.getCurrentAudio().title, this.getCurrentAudio().location);
+    },
 
     play: function(fileName, length){
 
@@ -96,7 +116,7 @@ Ext.define('MapStory.controller.Audio',{
             if (caller.mp3player){
                 caller.mp3player.release();
             }
-            caller.setIsPlaying(caller.STAT_STOP);
+            caller.getCurrentAudio().isPlaying = caller.STAT_STOP;
             caller.mp3player = new Media(fileName, null, onMediaError, onMediaStatusChanged);
             caller.mp3player.play();
 
@@ -110,24 +130,29 @@ Ext.define('MapStory.controller.Audio',{
                 case Media.MEDIA_RUNNING:
                     timer = setInterval(updateSlider, 500);
                     caller.getPlayer().start();
-                    caller.setIsPlaying(caller.STAT_PLAYING);
+                    caller.getCurrentAudio().isPlaying = caller.STAT_PLAYING;
                     break;
                 case Media.MEDIA_STOPPED:
                     clearInterval(timer);
                     caller.getSlider().setFlex(10000);
-                    caller.getPlayer().stop();
-                    caller.setIsPlaying(caller.STAT_STOP);
+                    caller.getCurrentAudio().isPlaying = caller.STAT_STOP;
 
-                    if (caller.getAChanged()){
-                        setTimeout(function(){
-                            caller.playAndStop();
-                        }, 2000);                        
+                    //能不能call release
+                    if (caller.getNextAudio().status == 2){
+                        caller.playAndStop();
+                    } else{
+                        caller.getPlayer().stop();
+                        //TO-DO：提示当前没有可用的新广播
+                        console.debug('nan');
+                        if (caller.getNextAudio().status != 1){
+                            caller.requestNewCore();
+                        }
                     }
                     break;
                 case Media.MEDIA_PAUSED:
                     clearInterval(timer);
                     caller.getPlayer().stop();
-                    caller.setIsPlaying(caller.STAT_PAUSE);
+                    caller.getCurrentAudio().isPlaying = caller.STAT_PAUSE;
                     break;
                 }
             };
@@ -161,14 +186,80 @@ Ext.define('MapStory.controller.Audio',{
 
             if (typeof Media != 'undefined'){
                 caller.mp3player.getCurrentPosition(function(t){
-                    caller.getSlider().setFlex(convert(t/caller.getALength()));
+                    var raw = t/caller.getCurrentAudio().duration;
+                    caller.getSlider().setFlex(convert(raw));
+                    caller.requestNew(caller.getCurrentAudio().duration-t);
                 });
             }
             else{
-                caller.getSlider().setFlex(convert(caller.mp3player.getCurrentTime()/caller.getALength()));
+                var raw = caller.mp3player.getCurrentTime()/caller.getCurrentAudio().duration;
+                caller.getSlider().setFlex(convert(raw));
+                caller.requestNew(caller.getCurrentAudio().duration-caller.mp3player.getCurrentTime());
             }
         }
     },
 
+    // 向map请求下一条mp3，由update调用，负责判断是否真正发出请求，保证调用时播放器正在播放
+    requestNew: function(remainder){
 
+        if (remainder > 10 || this.getNextAudio().status != 0) return;
+        console.debug('remainder: '+ remainder+ ', status: '+ this.getNextAudio().status);
+        this.requestNewCore();
+    },
+
+
+    requestNewCore: function(){
+        console.debug('requestNext');
+
+        this.getNextAudio().status = 1;
+        var mapCtrl = MapStory.app.getController('Map');
+        mapCtrl.requestNearestAudio(this);
+    },
+
+    // map 返回当前可用的mp3，响应audio.如果不达要求，audio可以再次提出请求
+    setNextSong: function(data, idx){
+
+        b = idx;
+        k = data; 
+
+        console.debug('setNextSong');
+
+        if (data.datas[idx]._id == this.getCurrentAudio().id){ // 无效的返回，重新申请
+            return false;
+        } else {
+            var next = this.getNextAudio();
+            var content = data.datas[idx];
+            next.status = 2;
+            next.id = content._id;
+            next.location = content._name;
+            next.url = MapStory.Config.getResourcePrefix()+'mp3/'+content.mp3;
+            next.title = content.title;
+            next.duration = content.alength;
+            console.log(next);
+            console.log(content);
+
+            // 如果这个时候播放器已经停止，则重启播放器
+            if (this.getCurrentAudio().isPlaying == this.STAT_STOP){
+                console.debug('restart player');
+                this.playAndStop();
+            } else {
+                // 设定expired timeout
+                this.audioExpiredTimeout = setTimeout(function(){
+                    console.debug('mp3 expired');
+                    next.status = 0;
+                }, this.getAudioExpiredTime());
+            }
+            return true;
+        }
+    },
+
+    helper:{
+        copySettings: function(target, source){
+            target.url = source.url;
+            target.duration = source.duration;
+            target.id = source.id;
+            target.title = source.title;
+            target.location = source.location;
+        }
+    }
 });

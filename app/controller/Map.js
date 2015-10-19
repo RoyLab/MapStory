@@ -9,8 +9,14 @@ Ext.define('MapStory.controller.Map',{
         searchPlugin:null,
         geolocationPlugin:null,
         geoResult:null,
-        marker:null
+        marker:null,
+
+        audioConfig:{
+            audioCtrl: null,
+            requestNextAudio: false,
+        }
 	},
+
 
 	launch: function(app){
 
@@ -87,8 +93,7 @@ Ext.define('MapStory.controller.Map',{
                         console.info(str);
                     })();
 
-                    var mapCtrl = MapStory.app.getController('Map');
-                    mapCtrl.onGeolocationSuccess(data);
+                    caller.onGeolocationSuccess(data);
                 }
             );//返回定位信息
 
@@ -132,26 +137,41 @@ Ext.define('MapStory.controller.Map',{
 
     createCloudSearchPlugin: function(mapview){
 
+        var caller = this;
+
         AMap.service(["AMap.CloudDataSearch"], function(){
-            var mapCtrl = MapStory.app.getController('Map');
-            mapCtrl.setSearchPlugin(new AMap.CloudDataSearch('55e433fce4b02580c5f3037c', mapCtrl.getSearchOptions())); //构造云数据检索类
+            caller.setSearchPlugin(new AMap.CloudDataSearch('55e433fce4b02580c5f3037c', caller.getSearchOptions())); //构造云数据检索类
         });
     },
 
 
-    cloudSearchCallback: function(data){
+    requestNearestAudio: function(receiver){
+        this.getAudioConfig().audioCtrl = receiver;
 
-        var mapCtrl = MapStory.app.getController('Map');
+        // 立刻调用一次
+        this.cloudSearch(receiver);
+    },
 
-        if (mapCtrl.getSearchPlugin()){
+    cloudSearch: function(receiver){
 
-            mapCtrl.getSearchPlugin().searchNearBy(data.position, 30000, 
+        var caller = this;
+
+        if (caller.getSearchPlugin()){
+
+            caller.getSearchPlugin().searchNearBy(caller.getGeoResult().position, 30000, 
                 function(status, result) {
-
                     if (status === 'complete' && result.info === 'OK') {
-                        var nearest = mapCtrl.chooseNearest(result);
-                        console.log('the current music is :'+result.datas[nearest].mp3);
+                        var nearest = caller.chooseNearest(result);
+                        caller.getAudioConfig().requestNextAudio = false;
+                        var res = receiver.setNextSong(result, nearest);
+                        if (res){
+                            console.info('the current music is :'+result.datas[nearest].mp3);
+                        } else {
+                            caller.getAudioConfig().requestNextAudio = true;
+                            console.info('No more mp3 available.')
+                        }
                     }else{
+                        this.getAudioConfig().requestNextAudio = true;
                         console.info('No mp3 available.')
                     }
                 }
@@ -162,6 +182,10 @@ Ext.define('MapStory.controller.Map',{
     onGeolocationSuccess: function(data){
         this.setGeoResult(data);
         this.getMarker().setPosition(data.position);
+
+        if (this.getAudioConfig().requestNextAudio){
+            this.cloudSearch(this.getAudioConfig().audioCtrl);
+        }
     },
 
     chooseNearest: function(result){
