@@ -55,6 +55,8 @@ Ext.define('MapStory.controller.Audio',{
 
     playAndStop:function(){
 
+        var caller = this;
+
         switch(this.getCurrentAudio().isPlaying){
 
         case this.STAT_STOP:
@@ -65,8 +67,11 @@ Ext.define('MapStory.controller.Audio',{
                 this.getNextAudio().status = 0;
                 clearTimeout(this.audioExpiredTimeout);
             } else{
-                this.restart();
-                // 弹出提示框
+                Ext.Msg.confirm('没有新的广播推送','是否再次播放当前曲目？', function(buttonId){
+                    if (buttonId == 'yes'){
+                        caller.restart();
+                    }
+                });
             }
             break;
         case this.STAT_PAUSE:
