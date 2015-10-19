@@ -240,9 +240,7 @@ Ext.define('MapStory.controller.Audio',{
             next.url = MapStory.Config.getResourcePrefix()+'mp3/'+content.mp3;
             next.title = content.title;
             next.duration = content.alength;
-            console.log(next);
-            console.log(content);
-
+            
             // 如果这个时候播放器已经停止，则重启播放器
             if (this.getCurrentAudio().isPlaying == this.STAT_STOP){
                 console.debug('restart player');

@@ -11,6 +11,11 @@ Ext.define('MapStory.controller.Map',{
         geoResult:null,
         marker:null,
 
+        bounds:new AMap.Bounds(new AMap.LngLat(121.422701,31.016566),
+                                new AMap.LngLat(121.452398,31.034954)),
+
+        validLocation: 0,
+
         audioConfig:{
             audioCtrl: null,
             requestNextAudio: false,
@@ -40,10 +45,9 @@ Ext.define('MapStory.controller.Map',{
             resizeEnable: true
         });
 
-        var mapview = this.mapview,
-        	sw = new AMap.LngLat(121.422701,31.016566),
-        	ne = new AMap.LngLat(121.452398,31.034954);
-        //mapview.setLimitBounds(new AMap.Bounds(sw,ne));
+        var mapview = this.mapview;
+
+        mapview.setLimitBounds(this.getBounds());
 
         this.createCloudLayer(mapview);
         this.createGeolocationPlugin(mapview);
@@ -74,7 +78,7 @@ Ext.define('MapStory.controller.Map',{
                 buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
                 showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
                 showCircle: false,        //定位成功后用圆圈表示定位精度范围，默认：true
-                panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+                panToLocation: false,     //定位成功后将定位到的位置作为地图中心点，默认：true
                 zoomToAccuracy:false      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
             });
             caller.setGeolocationPlugin(geolocation);
@@ -109,6 +113,28 @@ Ext.define('MapStory.controller.Map',{
             }, null);
         }
 	},
+
+
+    onGeolocationSuccess: function(data){
+        this.setGeoResult(data);
+
+        if (this.getBounds().contains(data.position)){
+            this.getMarker().setPosition(data.position);
+            this.mapview.setCenter(data.position);
+            this.setValidLocation(5);
+        } else {
+            var count = this.getValidLocation();
+            this.setValidLocation(count-1);
+            if (count < 1){
+                this.getMarker().setPosition(data.position);
+                Ext.Msg.alert('定位错误','您不在交大闵行校区内！', Ext.emptyFn);
+            }
+        }
+
+        if (this.getAudioConfig().requestNextAudio){
+            this.cloudSearch(this.getAudioConfig().audioCtrl);
+        }
+    },
 
     createCloudLayer: function(mapview){
 
@@ -158,7 +184,7 @@ Ext.define('MapStory.controller.Map',{
 
         if (caller.getSearchPlugin()){
 
-            caller.getSearchPlugin().searchNearBy(caller.getGeoResult().position, 30000, 
+            caller.getSearchPlugin().searchNearBy(caller.getGeoResult().position, 500, 
                 function(status, result) {
                     if (status === 'complete' && result.info === 'OK') {
                         var nearest = caller.chooseNearest(result);
@@ -176,15 +202,6 @@ Ext.define('MapStory.controller.Map',{
                     }
                 }
             );          
-        }
-    },
-
-    onGeolocationSuccess: function(data){
-        this.setGeoResult(data);
-        this.getMarker().setPosition(data.position);
-
-        if (this.getAudioConfig().requestNextAudio){
-            this.cloudSearch(this.getAudioConfig().audioCtrl);
         }
     },
 
