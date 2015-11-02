@@ -237,7 +237,7 @@ Ext.define('MapStory.controller.Audio',{
             next.status = 2;
             next.id = content._id;
             next.location = content._name;
-            next.url = MapStory.Config.getResourcePrefix()+'mp3/'+content.mp3;
+            next.url = MapStory.Config.getWebsite()+content.mp3+'.mp3';
             next.title = content.title;
             next.duration = content.alength;
             

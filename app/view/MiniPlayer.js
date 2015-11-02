@@ -51,11 +51,11 @@ Ext.define('MapStory.view.MiniPlayer', {
             width:75,
             height:75,
 
-            listeners:{
+            /*listeners:{
                 tap: function() {
                     Ext.getCmp('mainview').push(Ext.create('MapStory.view.Player'));
                 }
-            }
+            }*/
         },
         {
             xtype:'spacer',

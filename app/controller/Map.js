@@ -4,18 +4,15 @@ Ext.define('MapStory.controller.Map',{
 
 	config:{
 
-        initPosition: new AMap.LngLat(121.436305,31.025227),
+        initPosition:null,
         searchOptions:{orderBy: '_id:ASC'},
         searchPlugin:null,
         geolocationPlugin:null,
         geoResult:null,
         marker:null,
-
-        bounds:new AMap.Bounds(new AMap.LngLat(121.422701,31.016566),
-                                new AMap.LngLat(121.452398,31.034954)),
-
-        validLocation: 0,
-
+        bounds:null,
+        loadjsTimer:null,
+        validLocation: 0,//计数器，延迟决定是否认为当前不属于交大
         audioConfig:{
             audioCtrl: null,
             requestNextAudio: false,
@@ -25,16 +22,34 @@ Ext.define('MapStory.controller.Map',{
 
 	launch: function(app){
 
+        var caller = this;
+        clearInterval(caller.getLoadjsTimer());
+
+        if (typeof AMap == 'undefined')
+        {
+            console.warn('Fail to load Mapjs.');
+            caller.setLoadjsTimer(
+                setInterval(function(){
+                    caller.helper.loadjs("http://webapi.amap.com/maps?v=1.3&key=c66c95a7afc6d74979632a589b5b656e", 
+                        function(param){
+                            caller.launch(app);
+                        }, app);
+                    }, 2000));
+            return;
+        }
+
+        this.initParam();
 		this.createMap();
 	},
 
-	createMap: function() {
+    initParam: function(){
 
-		if (typeof AMap == 'undefined')
-		{
-			console.error('Fail to load Mapjs.');
-			return;
-		}
+        this.setInitPosition(new AMap.LngLat(121.436305,31.025227));
+        this.setBounds(new AMap.Bounds(new AMap.LngLat(121.422701,31.016566),
+                                new AMap.LngLat(121.452398,31.034954)));
+    },
+
+	createMap: function() {
 
         this.mapview = new AMap.Map(MapStory.Config.getMapId(), {
             view: new AMap.View2D({//创建地图二维视口
@@ -197,7 +212,7 @@ Ext.define('MapStory.controller.Map',{
                             console.info('No more mp3 available.')
                         }
                     }else{
-                        this.getAudioConfig().requestNextAudio = true;
+                        caller.getAudioConfig().requestNextAudio = true;
                         console.info('No mp3 available.')
                     }
                 }
@@ -220,19 +235,66 @@ Ext.define('MapStory.controller.Map',{
             }
         }
         return index;
-    }
+    },
 
-	/**
-	loadjs: function(script_filename) {
-	    var script = document.createElement('script');
-	    script.setAttribute('type', 'text/javascript');
-	    script.setAttribute('src', script_filename);
-	    script.setAttribute('id', 'amapjs');
-	 
-	    script_id = document.getElementById('amapjs');
-	    if(script_id){
-	        document.getElementsByTagName('head')[0].removeChild(script_id);
-	    }
-	    document.getElementsByTagName('head')[0].appendChild(script);
-	}*/
+	
+	helpler:{
+
+        loadjs: function(script_filename, callback, param) {
+        
+            var script = document.createElement('script');
+            script.setAttribute('type', 'text/javascript');
+            script.setAttribute('src', script_filename);
+            script.setAttribute('id', 'amapjs');
+            if (script.addEventListener) {
+                script.addEventListener('load', function () {
+                    callback(param);
+                }, false);
+            } else if (script.attachEvent) {
+                script.attachEvent('onreadystatechange', function () {
+                    var target = window.event.srcElement;
+                    if (target.readyState == 'loaded') {
+                        callback(param);
+                    }
+                });
+            }
+         
+            script_id = document.getElementById('amapjs');
+            if(script_id){
+                document.getElementsByTagName('head')[0].removeChild(script_id);
+            }
+            document.getElementsByTagName('head')[0].appendChild(script);
+        },
+
+        ping: function (ip, callback) {
+            if (!this.inUse) {
+                this.status = 'unchecked';
+                this.inUse = true;
+                this.callback = callback;
+                this.ip = ip;
+                var _that = this;
+                this.img = new Image();
+                this.img.onload = function () {
+                    _that.inUse = false;
+                    _that.callback('responded');
+
+                };
+                this.img.onerror = function (e) {
+                    if (_that.inUse) {
+                        _that.inUse = false;
+                        _that.callback('responded', e);
+                    }
+
+                };
+                this.start = new Date().getTime();
+                this.img.src = "http://" + ip;
+                this.timer = setTimeout(function () {
+                    if (_that.inUse) {
+                        _that.inUse = false;
+                        _that.callback('timeout');
+                    }
+                }, 1500);
+            }    
+        }
+    }
 });

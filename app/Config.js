@@ -4,7 +4,7 @@ Ext.define('MapStory.Config', {
     singleton : true,
   
     config : {  
-        website:'http://londit-50c03e41547f8.com.1130.url-test.com',
+        website:'http://202.120.38.143/~shengbin/map/',
         mapId:'mapview',
         miniPlayerId:'mplayer',
         _resPrefix:null
