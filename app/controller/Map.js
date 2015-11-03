@@ -4,6 +4,28 @@ Ext.define('MapStory.controller.Map',{
 
 	config:{
 
+        control:{
+            refreshButton:{
+                tap:function() {
+                    var button = this.getRefreshButton();
+                    button.setIconCls('');
+                    button.setStyle('background: url(resources/images/spinner.gif);');
+                    button.setBorder(0);
+                    button.setHeight(32);
+                    button.setWidth(32);
+                    //button.setIcon("resources/images/spinner.gif");
+                    setTimeout(function(){
+                        button.hide();
+                    },1000);
+                }
+            }
+        },
+
+        refs:{
+            refreshButton:'#refresh_map_button'
+        },
+
+
         initPosition:null,
         searchOptions:{orderBy: '_id:ASC'},
         searchPlugin:null,

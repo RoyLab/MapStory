@@ -1,5 +1,5 @@
 Ext.define('MapStory.view.Main', {
-    extend: 'Ext.NavigationView',
+    extend: 'Ext.navigation.View',
     xtype: 'main',
     requires: [
         'Ext.TitleBar',
@@ -7,20 +7,56 @@ Ext.define('MapStory.view.Main', {
     ],
     config: {
 
+        navigationBar: {
+
+            items: [
+                {
+                    xtype: 'button',
+                    id: 'listButton',
+                    align:'right',
+                    iconCls: 'list',
+                    ui: 'plain',
+                    handler: function(){
+                        if(Ext.Viewport.getMenus().right.isHidden()){
+                            Ext.Viewport.showMenu('right');
+                        }
+                        else
+                        {
+                            Ext.Viewport.hideMenu('right');
+                        }
+                    }
+                },
+            ]
+        },
+
         id:'mainview',
 
         items:[
         {
-            xtype:'container',
             title:'地图故事：交大2015',
-            layout:'vbox',
+            layout: {
+                type: 'vbox',
+                align:'center'
+            },
 
             items: [
+            {
+                xtype:'button',
+                //ui:'normal',
+                id:'refresh_map_button',
+                margin:5,
+                iconCls:'refresh',
+                hideAnimation: Ext.os.is.Android ? false : {
+                    type: 'fadeOut',
+                    duration: 500
+                },
+            },
             {
                 xtype:'container',
                 style:'background:#eee',
                 flex:1,
                 layout:'fit',
+                width:'100%',
                 items:[
                 {
                     xtype:'container',
@@ -45,5 +81,30 @@ Ext.define('MapStory.view.Main', {
                 flex:1
             }*/] 
         }],
+    },
+
+    initialize: function(){
+        Ext.Viewport.setMenu(this.createMenu(),{
+            side: 'right',
+            reveal: true
+        });
+    },
+ 
+    createMenu: function(){
+        var menu = Ext.create('Ext.Menu', {
+            width: 250,
+            scrollable: 'vertical',
+            items: [
+                {
+                    xtype: 'button',
+                    text: 'Option 1',
+                },
+                {
+                    xtype: 'button',
+                    text: 'Option 2',
+                }
+            ]
+        });
+        return menu;
     }
 });
