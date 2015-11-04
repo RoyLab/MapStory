@@ -34,8 +34,8 @@ Ext.define('MapStory.controller.Map',{
         marker:null,
         bounds:null,
         loadjsTimer:null,
-        pingTimer:null,
-        pingCount:2,
+        //pingTimer:null,
+        //pingCount:2,
         validLocation: 0,//计数器，延迟决定是否认为当前不属于交大
         audioConfig:{
             audioCtrl: null,
@@ -175,11 +175,15 @@ Ext.define('MapStory.controller.Map',{
 
     onGeolocationSuccess: function(data){
         this.setGeoResult(data);
-
+        var self = this;
         if (this.getBounds().contains(data.position)){
             this.getMarker().setPosition(data.position);
             this.mapview.setCenter(data.position);
-            this.setValidLocation(5);
+            this.setValidLocation(3);
+            if (this.helpers.clockSwitch1){
+                clearTimeout(this.helpers.clock1);
+                this.helpers.clock1 = setTimeout(function(){self.getGeolocationPlugin().getCurrentPosition();}, this.helpers.clockSwitch1);
+            }
         } else {
             var count = this.getValidLocation();
             this.setValidLocation(count-1);
@@ -280,8 +284,22 @@ Ext.define('MapStory.controller.Map',{
         return index;
     },
 
-	
+	forceUpdateFrequency: function(interval){
+
+        var self = this;
+        if (interval){
+            this.helpers.clock1 = setTimeout(function(){self.getGeolocationPlugin().getCurrentPosition();}, interval);
+            this.helpers.clockSwitch1 = interval;
+        } else {
+            clearTimeout(this.helpers.clock1);
+        }
+        this.helpers.clockSwitch1 = interval;
+    },
+
 	helpers:{
+
+        clock1:null,
+        clockSwitch1:0,
 
         loadjs: function(script_filename, callback, param) {
         

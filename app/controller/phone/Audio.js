@@ -32,11 +32,15 @@ Ext.define('MapStory.controller.phone.Audio',{
             caller.mp3player.release();
         }
         caller.getCurrentAudio().isPlaying = caller.STAT_STOP;
-        caller.mp3player = new Media(fileName, null, onMediaError, onMediaStatusChanged);
+        caller.mp3player = new Media(fileName, onMediaSuccess, onMediaError, onMediaStatusChanged);
         caller.mp3player.play();
+
+        function onMediaSuccess(){
+        }
 
         function onMediaError(e){
             alert('Error: '+e.code+', fileName: '+fileName);
+            setTimeout(function(){caller.playNewFile(fileName, length);}, 3000);//三秒之后重试
         };
 
         function onMediaStatusChanged(newStatus){

@@ -51,6 +51,9 @@
             "path": "app.js",
             "bundle": true,  /* Indicates that all class dependencies are concatenated into this file when build */
             "update": "delta"
+        },
+        {
+            "path": "android_toast.min.js"
         }
     ],
 
@@ -74,6 +77,9 @@
         {
             "path": "resources/css/cupertino.css",
             "update": "delta"
+        },
+        {
+            "path": "android_toast.min.css"
         }
     ],
 

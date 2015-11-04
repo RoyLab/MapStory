@@ -68,6 +68,12 @@ Ext.define('MapStory.controller.Audio',{
 
     playAndStop:function(){
 
+        var mapCtrl = MapStory.app.getController('Map');
+        if (!mapCtrl.mapview){
+            Ext.Msg.alert('网络错误','请保持网络连接', Ext.emptyFn);
+            return;
+        }
+
         var caller = this;
 
         switch(this.getCurrentAudio().isPlaying){
@@ -134,7 +140,6 @@ Ext.define('MapStory.controller.Audio',{
     setNextSong: function(data, idx){
 
         console.debug('setNextSong');
-        var self = this;
 
         if (data.datas[idx]._id == this.getCurrentAudio().id){ // 无效的返回，重新申请
             return false;
@@ -148,6 +153,7 @@ Ext.define('MapStory.controller.Audio',{
             next.title = content.title;
             next.duration = content.alength;
             MapStory.Config.setBgImage(this.getStatusButton(), 'none');
+            this.watchConnection(0);
 
             // 如果这个时候播放器已经停止，则重启播放器
             if (this.getCurrentAudio().isPlaying == this.STAT_STOP){
@@ -166,6 +172,7 @@ Ext.define('MapStory.controller.Audio',{
 
     onStopped: function(caller){
 
+        caller = this;
         caller.getSlider().setFlex(10000);
         clearInterval(caller.getTimer());
         caller.getPlayer().stop();
@@ -180,7 +187,14 @@ Ext.define('MapStory.controller.Audio',{
             if (caller.getNextAudio().status != 1){
                 caller.requestNewCore();
             }
+
+            caller.watchConnection(10000);
         }
+    },
+    
+    watchConnection: function(interval){
+        var mapCtrl = MapStory.app.getController('Map');
+        mapCtrl.forceUpdateFrequency(interval);
     },
 
     helpers:{
