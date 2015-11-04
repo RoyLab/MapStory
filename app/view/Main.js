@@ -10,20 +10,6 @@ Ext.define('MapStory.view.Main', {
 
         id:'mainview',
 
-        listeners:{
-            activeitemchange:function(self, item){
-                if (item.getId()=='homepage'){
-                    setTimeout(function(){
-                        Ext.getCmp('listButton').show();
-                        Ext.getCmp('_main_statusButton').show();
-                    },300);
-                } else {
-                    Ext.getCmp('listButton').hide();
-                    Ext.getCmp('_main_statusButton').hide();
-                }
-            }
-        },
-
         layout:{
             type:'card',
             animation:{

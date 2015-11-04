@@ -57,7 +57,6 @@ Ext.application({
             side: 'left',
             cover: false
         });
-
     },
 
     createMenu: function(){

@@ -6,8 +6,14 @@ Ext.define('MapStory.controller.Audio',{
 
         control:{
             playButton:{
-                tap:'playAndStop'
-            }
+                tap:'playAndStop',
+                scope:this
+            },
+
+            mainview:{
+                activeitemchange:'switchRule',
+                scope:this
+            },
         },
 
         refs:{
@@ -15,6 +21,7 @@ Ext.define('MapStory.controller.Audio',{
             playButton:'#_mn_playButton',
             slider:'#_mn_used',
             statusButton:'#_main_statusButton',
+            mainview:'#mainview'
         },
 
 
@@ -48,6 +55,25 @@ Ext.define('MapStory.controller.Audio',{
 	launch: function(app){
 
 	},
+
+    switchRule: function(self, item){
+
+        var self = this;
+
+        if (item.getId()=='homepage'){
+            if (self.getCurrentAudio().isPlaying == self.STAT_PLAYING)
+                self.resume();
+            setTimeout(function(){
+                Ext.getCmp('listButton').show();
+                Ext.getCmp('_main_statusButton').show();
+            },300);
+        } else {
+            if (self.getCurrentAudio().isPlaying == self.STAT_PAUSE)
+                self.pause();
+            Ext.getCmp('listButton').hide();
+            Ext.getCmp('_main_statusButton').hide();
+        }
+    },
 
     pause: function(){
         this.mp3player.pause();

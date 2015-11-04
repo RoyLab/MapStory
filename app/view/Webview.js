@@ -1,35 +1,30 @@
 Ext.define('MapStory.view.Webview', {
-    extend: 'Ext.Container',
+    extend: 'Ext.Component',
 
     xtype: 'webview',
 
     config: {
-        /**
-         * @cfg {String} url URL to load
-         */
-        url : 'http://localhost:8080',
+        url : 'http://sina.cn/',
         title:'附近的视频',
 
-        /**
-         * @cfg
-         * @inheritdoc
-         *
-         * Add your own style
-         */
-        baseCls : Ext.baseCSSPrefix + 'iframe'
     },
 
-    initialize: function() {
-        var me = this;
-        me.callParent();
-alert(true);
-        me.iframe = this.element.createChild({
-            tag   : 'iframe',
-            src   : this.getUrl(),
-            style : 'width: 100%; height: 100%;'
-        });
+    initialize:function(){
+        this.callParent();
+        var self = this;
+        setTimeout(function(){self.createIframe(self.getUrl());}, 1000);
+    },
 
-        me.relayEvents(me.iframe, '*');
+    createIframe:function(url){
+        var comp = document.createElement('iframe');
+        comp.setAttribute('src', url);
+        comp.setAttribute('width', '100%');
+        comp.setAttribute('height', '100%');
+
+        k = this;
+        var elem = document.getElementById(this.getId());
+        //elem.removeChild(elem.childNodes[0]);
+        elem.appendChild(comp);
     }
 
 });
