@@ -51,6 +51,15 @@ Ext.define('MapStory.view.MiniPlayer', {
             width:75,
             height:75,
 
+                listeners:{
+                    tap:{
+                        //event: 'tap',
+                        fn: function() {
+                            console.log('fdasfdsfad');
+                            Ext.getCmp('mainview').push(Ext.create('MapStory.view.test'));
+                        }
+                    }
+                }
             /*listeners:{
                 tap: function() {
                     Ext.getCmp('mainview').push(Ext.create('MapStory.view.Player'));

@@ -174,6 +174,10 @@ Ext.define('MapStory.controller.Map',{
 
 
     onGeolocationSuccess: function(data){
+        // sim location
+        if (this.helpers.isSimLocation){
+            data.position = this.helpers.getSimLocation();
+        }
         this.setGeoResult(data);
         var self = this;
         if (this.getBounds().contains(data.position)){
@@ -288,10 +292,11 @@ Ext.define('MapStory.controller.Map',{
 
         var self = this;
         if (interval){
-            this.helpers.clock1 = setTimeout(function(){self.getGeolocationPlugin().getCurrentPosition();}, interval);
+            this.helpers.clock1 = setInterval(function(){self.getGeolocationPlugin().getCurrentPosition();}, interval);
             this.helpers.clockSwitch1 = interval;
+            self.getGeolocationPlugin().getCurrentPosition();
         } else {
-            clearTimeout(this.helpers.clock1);
+            clearInterval(this.helpers.clock1);
         }
         this.helpers.clockSwitch1 = interval;
     },
@@ -300,6 +305,54 @@ Ext.define('MapStory.controller.Map',{
 
         clock1:null,
         clockSwitch1:0,
+
+        isSimLocation:true,
+
+        getSimLocation: function(){
+            function computeDist(p1, p2){
+                var a = Math.pow(p1[0]-p2[0], 2);
+                var b = Math.pow(p1[1]-p2[1], 2);
+                return Math.sqrt(a+b);
+            }
+
+            var pos = MapStory.Config.getSimPath(),
+                timer = null;
+            if (!this.dist){
+                var dist = 0, cur = pos[0];
+                for (var i = 1; i < pos.length; i++){
+                    dist += computeDist(cur, pos[i]);
+                    cur = pos[i];
+                }
+                this.step = dist/500;
+                this.dist = dist;
+                this.cur = 0;
+                this.curIndex = 0;
+
+                var self = this;
+                timer = setInterval(function(){
+                    self.cur += self.step;
+                    var dist = computeDist(pos[self.curIndex], pos[self.curIndex+1]);
+                    if (self.cur >= dist){
+                        self.curIndex += 1;
+                        if (pos.length - 1 == self.curIndex){
+                            clearInterval(timer);
+                            self.curIndex -= 1;
+                            self.cur = 0;
+                        } else {
+                            self.cur -= dist;
+                        }
+                    }
+                }, 2000);
+            }
+
+            var pos1 = pos[this.curIndex];
+            var pos2 = pos[this.curIndex+1];
+            var dist = computeDist(pos1, pos2);
+            var coef = this.cur/dist;
+
+            return new AMap.LngLat((1-coef)*pos1[0]+coef*pos2[0],
+                (1-coef)*pos1[1]+coef*pos2[1]);
+        },
 
         loadjs: function(script_filename, callback, param) {
         
@@ -325,9 +378,9 @@ Ext.define('MapStory.controller.Map',{
                 document.getElementsByTagName('head')[0].removeChild(script_id);
             }
             document.getElementsByTagName('head')[0].appendChild(script);
-        },
+        }
 
-        ping: function (ip, callback) {
+        /*ping: function (ip, callback) {
 
             if (!this.inUse) {
                 this.status = 'unchecked';
@@ -358,6 +411,6 @@ Ext.define('MapStory.controller.Map',{
                     }
                 }, 1500);
             }    
-        }
+        }*/
     }
 });

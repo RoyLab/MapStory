@@ -1,5 +1,5 @@
 Ext.define('MapStory.view.Main', {
-    extend: 'Ext.navigation.View',
+    extend: 'Ext.NavigationView',
     xtype: 'main',
     requires: [
         'Ext.TitleBar',
@@ -7,14 +7,14 @@ Ext.define('MapStory.view.Main', {
         'Ext.Menu'
     ],
     config: {
-
+        showAnimation:'slide',
         navigationBar: {
 
             items: [
             {
                 xtype:'button',
                 id: '_main_statusButton',
-                //align:'left',
+                iconCls:'refresh',
                 width:40,
             },
             {
@@ -37,8 +37,8 @@ Ext.define('MapStory.view.Main', {
 
         id:'mainview',
 
-        items:[
-        {
+
+        items:[{
             title:'地图故事：交大2015',
             layout: {
                 type: 'vbox',
@@ -46,18 +46,6 @@ Ext.define('MapStory.view.Main', {
             },
 
             items: [
-            /*{
-                xtype:'button',
-                //ui:'normal',
-                id:'refresh_map_button',
-                margin:5,
-                hidden:true,
-                iconCls:'refresh',
-                hideAnimation:{
-                    type: 'fadeOut',
-                    duration: 500
-                },
-            },*/
             {
                 xtype:'container',
                 style:'background:#eee',
@@ -72,35 +60,31 @@ Ext.define('MapStory.view.Main', {
                 },
                 {
                     xtype:'container',
-                    //src:'resources/images/album2.jpg',
                     id:MapStory.Config.getMapId(),
                     margin:20,
-                    //style:'position: relative;',
                 }]
             },
             {
                 xtype:'miniplayer',
                 docked:'bottom',
-            },
-            /*{
-                xtype:'panel',
-                id:'allmap',
-                flex:1
-            }*/] 
-        }],
+            }] 
+        }]
     },
 
-    initialize: function(){
+    /*initialize: function(){
         Ext.Viewport.setMenu(this.createMenu(),{
             side: 'right',
             reveal: true
         });
-    },
+    },*/
  
-    createMenu: function(){
+    /*createMenu: function(){
+
+        var self = this;
+
         var menu = Ext.create('Ext.Menu', {
             width: 250,
-            scrollable: 'vertical',
+            scrollable: false,
             style:'background: url(resources/images/menubg.jpg);\
                     background-repeat: no-repeat;\
                     background-position:bottom;',
@@ -108,6 +92,11 @@ Ext.define('MapStory.view.Main', {
                 {
                     xtype: 'button',
                     text: '搜索视频',
+
+                    handler:function(){
+                        Ext.Viewport.hideMenu('right');
+                        Ext.getCmp('mainview').push(Ext.create('MapStory.view.test'));
+                    }
                 },
                 {
                     xtype: 'button',
@@ -116,9 +105,20 @@ Ext.define('MapStory.view.Main', {
                 {
                     xtype: 'button',
                     text: '帮助',
+                },
+                {
+                    xtype: 'togglefield',
+                    label: '模拟地点',
+                    labelWidth:'60%',
+                    value: 1,
+                    listeners:{
+                        change:function(){
+                            MapStory.app.getController('Map').helpers.isSimLocation = (this.getValue())?true:false;
+                        }
+                    }
                 }
             ]
         });
         return menu;
-    },
+    }*/
 });

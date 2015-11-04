@@ -193,6 +193,7 @@ Ext.define('MapStory.controller.Audio',{
     },
     
     watchConnection: function(interval){
+        console.log('forceUpdate');
         var mapCtrl = MapStory.app.getController('Map');
         mapCtrl.forceUpdateFrequency(interval);
     },
