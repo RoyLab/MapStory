@@ -81,11 +81,14 @@ Ext.define('MapStory.view.MiniPlayer', {
         },
         {xtype:'spacer'},
         {
-            xtype:'image',
-            src:'resources/images/stop.png',
+            xtype:'button',
+            style:'background: url(resources/images/stop.png);\
+                    background-repeat: no-repeat;\
+                    background-position:center;',
             id:'_mn_playButton',
-            width:50,
-            height:50, 
+            border:0,
+            width:52,
+            height:52, 
         },
         {
             xtype:'spacer',
@@ -95,15 +98,57 @@ Ext.define('MapStory.view.MiniPlayer', {
 
 
     start:function(){
-        Ext.getCmp('_mn_playButton').setSrc('resources/images/start.png');  
+        Ext.getCmp('_mn_playButton').setStyle('background: url(resources/images/start.png);\
+                    background-repeat: no-repeat;\
+                    background-position:center;');  
     },
 
     stop:function(){
-        Ext.getCmp('_mn_playButton').setSrc('resources/images/stop.png');
+        Ext.getCmp('_mn_playButton').setStyle('background: url(resources/images/stop.png);\
+                    background-repeat: no-repeat;\
+                    background-position:center;');  
     },
 
     applyText:function(title, location){
         Ext.getCmp('_mp_mainTitle').setHtml(title);
         Ext.getCmp('_mp_location').setHtml(location);
+    },
+
+    showWaitingPanel:function(caller){
+
+        caller = this;
+
+        if (!caller.overlay) {
+            caller.overlay = Ext.Viewport.add({
+                xtype: 'panel',
+                modal: true,
+                hideOnMaskTap: false,
+                showAnimation: {
+                    type: 'popIn',
+                    duration: 250,
+                    easing: 'ease-out'
+                },
+                hideAnimation: {
+                    type: 'popOut',
+                    duration: 250,
+                    easing: 'ease-out'
+                },
+                centered: true,
+                width:200,
+                height: 50,
+                styleHtmlContent: true,
+                html: '<p>正在为您准备下一曲目...</p>',
+                scrollable: true
+            });
+        }
+
+        caller.overlay.show();        
+    },
+
+    hideWaitingPanel:function(){
+        if (this.overlay){
+            this.overlay.hide();
+        }
     }
+
 });

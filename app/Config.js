@@ -30,5 +30,17 @@ Ext.define('MapStory.Config', {
             this.set_resPrefix('resources/');
         }
         return this.get_resPrefix();
+    },
+
+    // 可能会覆盖其他效果
+    setBgImage:function(elem, url){
+        elem.setStyle(this.getBgImageCSS(url));
+    },
+
+    getBgImageCSS:function(url){
+        var it = 'background: $1;\
+                    background-repeat: no-repeat;\
+                    background-position:center;'.replace('$1', url);
+        return it;
     }
 });  

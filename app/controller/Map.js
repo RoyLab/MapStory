@@ -5,7 +5,7 @@ Ext.define('MapStory.controller.Map',{
 	config:{
 
         control:{
-            refreshButton:{
+            /*refreshButton:{
                 tap:function() {
                     var button = this.getRefreshButton();
                     button.setIconCls('');
@@ -18,11 +18,11 @@ Ext.define('MapStory.controller.Map',{
                         button.hide();
                     },1000);
                 }
-            }
+            }*/
         },
 
         refs:{
-            refreshButton:'#refresh_map_button'
+            //refreshButton:'#refresh_map_button'
         },
 
 
@@ -34,6 +34,8 @@ Ext.define('MapStory.controller.Map',{
         marker:null,
         bounds:null,
         loadjsTimer:null,
+        pingTimer:null,
+        pingCount:2,
         validLocation: 0,//计数器，延迟决定是否认为当前不属于交大
         audioConfig:{
             audioCtrl: null,
@@ -47,12 +49,30 @@ Ext.define('MapStory.controller.Map',{
         var caller = this;
         clearInterval(caller.getLoadjsTimer());
 
+        /*console.info('ping');
+        new caller.helpers.ping("202.120.38.143/~shengbin/map/null.jpg", function(response, e){
+
+            console.log(response+'.....');
+            console.log(e);
+            if (response == 'responded'){
+                caller.setPingCount(2);
+            } else {
+                var count = caller.getPingCount();
+                caller.setPingCount(count-1);
+                    console.info(count);
+                if (count == 0){
+                    console.info('ping2');
+                    var b = new Android_Toast({content: 'Please check your connection and try again.'});
+                }
+            }
+        });*/
+
         if (typeof AMap == 'undefined')
         {
             console.warn('Fail to load Mapjs.');
             caller.setLoadjsTimer(
                 setInterval(function(){
-                    caller.helper.loadjs("http://webapi.amap.com/maps?v=1.3&key=c66c95a7afc6d74979632a589b5b656e", 
+                    caller.helpers.loadjs("http://webapi.amap.com/maps?v=1.3&key=c66c95a7afc6d74979632a589b5b656e", 
                         function(param){
                             caller.launch(param);
                         }, app);
@@ -139,8 +159,9 @@ Ext.define('MapStory.controller.Map',{
             );//返回定位信息
 
             AMap.event.addListener(geolocation, 'error', 
-                function onError (data) {
+                function (e) {
                     console.warn('定位失败');
+                    console.warn(e);
         	});
         });
 
@@ -260,7 +281,7 @@ Ext.define('MapStory.controller.Map',{
     },
 
 	
-	helper:{
+	helpers:{
 
         loadjs: function(script_filename, callback, param) {
         
@@ -289,6 +310,7 @@ Ext.define('MapStory.controller.Map',{
         },
 
         ping: function (ip, callback) {
+
             if (!this.inUse) {
                 this.status = 'unchecked';
                 this.inUse = true;
@@ -298,6 +320,7 @@ Ext.define('MapStory.controller.Map',{
                 this.img = new Image();
                 this.img.onload = function () {
                     _that.inUse = false;
+                    console.log('success');
                     _that.callback('responded');
 
                 };

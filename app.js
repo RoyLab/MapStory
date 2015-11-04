@@ -24,9 +24,10 @@ Ext.application({
     ],
 
     controllers:[
-        'Map',
-        'Audio'
+        'Map'
     ],
+
+    profiles: ['Phone','Nonphone'],
 
     icon: {
         '57': 'resources/icons/Icon.png',

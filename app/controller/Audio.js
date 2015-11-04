@@ -13,7 +13,8 @@ Ext.define('MapStory.controller.Audio',{
         refs:{
             player:'#'+MapStory.Config.getMiniPlayerId(),
             playButton:'#_mn_playButton',
-            slider:'#_mn_used'
+            slider:'#_mn_used',
+            statusButton:'#_main_statusButton',
         },
 
 
@@ -27,15 +28,17 @@ Ext.define('MapStory.controller.Audio',{
         },
 
         nextAudio:{
-            url:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3',
-            duration:14,
+            url:MapStory.Config.getResourcePrefix()+'mp3/welcome.ogg',
+            duration:3,
             id:-1,
             title:'关于地图故事',
             location:'上海交通大学',
             status:2, // 0 not request, 1 requesting, 2 received
         },
 
-        audioExpiredTime:20000 // nextAudio will be stored for [audioExpiredTime] ms
+        audioExpiredTime:20000, // nextAudio will be stored for [audioExpiredTime] ms
+        timer:null,
+        isInit:false
 	},
 
     STAT_STOP:0,
@@ -44,14 +47,24 @@ Ext.define('MapStory.controller.Audio',{
 
 	launch: function(app){
 
-        var caller = this;
-
-        // for test only
-        /*setTimeout(function(){
-            caller.setAChanged(true);
-            caller.setATitle('第二首曲子');
-        }, 10000);*/
 	},
+
+    pause: function(){
+        this.mp3player.pause();
+        this.getCurrentAudio().isPlaying = this.STAT_PAUSE;
+        this.getPlayer().stop();
+        clearInterval(this.getTimer());
+    },
+
+    resume: function(){
+
+        var caller = this;
+        this.mp3player.play();
+        this.getCurrentAudio().isPlaying = this.STAT_PLAYING;
+        this.getPlayer().start();
+        this.setTimer(setInterval(function(){caller.updateSlider(caller)}, 500));
+    },
+
 
     playAndStop:function(){
 
@@ -61,11 +74,20 @@ Ext.define('MapStory.controller.Audio',{
 
         case this.STAT_STOP:
             if (this.getNextAudio().status == 2){
-                this.helper.copySettings(this.getCurrentAudio(), this.getNextAudio());
-                this.updateUI();
-                this.play(this.getCurrentAudio().url, this.getCurrentAudio().duration);
+
+                // 将候选MP3设置激活
+                this.helpers.copySettings(this.getCurrentAudio(), this.getNextAudio());
                 this.getNextAudio().status = 0;
                 clearTimeout(this.audioExpiredTimeout);
+                this.updateUI();
+
+                if (this.getIsInit()){
+                    caller.getPlayer().showWaitingPanel();
+                } else {
+                    this.setIsInit(true);
+                }
+                this.playNewFile(this.getCurrentAudio().url, this.getCurrentAudio().duration);
+
             } else{
                 Ext.Msg.confirm('没有新的广播推送','是否再次播放当前曲目？', function(buttonId){
                     if (buttonId == 'yes'){
@@ -84,126 +106,11 @@ Ext.define('MapStory.controller.Audio',{
 
     },
 
-
-    pause: function(){
-        if (typeof Media != 'undefined'){
-            this.mp3player.pause();
-        }
-    },
-
-    resume: function(){
-        if (typeof Media != 'undefined'){
-            this.mp3player.play();
-        }
-    },
-
-
-    restart: function(){
-        if (typeof Media != 'undefined'){
-            this.mp3player.seekTo(0);
-            this.mp3player.play();
-        }
-    },
-
     updateUI: function(){
         this.getPlayer().applyText(this.getCurrentAudio().title, this.getCurrentAudio().location);
     },
 
-    play: function(fileName, length){
 
-        var caller = this,
-            loaded = true,
-            timer = null;
-
-        if (typeof Media != 'undefined'){
-
-            // do some clean
-            if (caller.mp3player){
-                caller.mp3player.release();
-            }
-            caller.getCurrentAudio().isPlaying = caller.STAT_STOP;
-            caller.mp3player = new Media(fileName, null, onMediaError, onMediaStatusChanged);
-            caller.mp3player.play();
-
-            function onMediaError(e){
-                alert('Error: '+e.code+', fileName: '+fileName);
-            };
-
-            function onMediaStatusChanged(newStatus){
-
-                console.log(newStatus);
-                switch(newStatus){
-                case Media.MEDIA_RUNNING:
-                    timer = setInterval(updateSlider, 500);
-                    caller.getPlayer().start();
-                    caller.getCurrentAudio().isPlaying = caller.STAT_PLAYING;
-                    break;
-                case Media.MEDIA_STOPPED:
-                    clearInterval(timer);
-                    caller.getSlider().setFlex(10000);
-                    caller.getCurrentAudio().isPlaying = caller.STAT_STOP;
-
-                    //能不能call release
-                    if (caller.getNextAudio().status == 2){
-                        caller.playAndStop();
-                    } else{
-                        caller.getPlayer().stop();
-                        //TO-DO：提示当前没有可用的新广播
-                        console.debug('nan');
-                        if (caller.getNextAudio().status != 1){
-                            caller.requestNewCore();
-                        }
-                    }
-                    break;
-                case Media.MEDIA_PAUSED:
-                    clearInterval(timer);
-                    caller.getPlayer().stop();
-                    caller.getCurrentAudio().isPlaying = caller.STAT_PAUSE;
-                    break;
-                }
-            };
-        }else{
-            console.warn('No Media support found.')
-            caller.mp3player = Ext.create('Ext.Audio',{
-                url:fileName,
-                hidden:true,
-                listeners:{
-                    ended:function(){
-                        caller.getSlider().setFlex(10000);
-                        clearInterval(timer);
-                        caller.getPlayer().stop();
-                    }
-                }
-            });
-
-            if (caller.mp3player && loaded){
-                caller.mp3player.play();
-                caller.getPlayer().start();
-                timer = setInterval(updateSlider, 500);
-            }
-        }
-
-        function updateSlider(){
-
-            function convert(value){
-                if (value >= 1.0) return 10000;
-                else return value / (1-value);
-            }
-
-            if (typeof Media != 'undefined'){
-                caller.mp3player.getCurrentPosition(function(t){
-                    var raw = t/caller.getCurrentAudio().duration;
-                    caller.getSlider().setFlex(convert(raw));
-                    caller.requestNew(caller.getCurrentAudio().duration-t);
-                });
-            }
-            else{
-                var raw = caller.mp3player.getCurrentTime()/caller.getCurrentAudio().duration;
-                caller.getSlider().setFlex(convert(raw));
-                caller.requestNew(caller.getCurrentAudio().duration-caller.mp3player.getCurrentTime());
-            }
-        }
-    },
 
     // 向map请求下一条mp3，由update调用，负责判断是否真正发出请求，保证调用时播放器正在播放
     requestNew: function(remainder){
@@ -218,6 +125,7 @@ Ext.define('MapStory.controller.Audio',{
         console.debug('requestNext');
 
         this.getNextAudio().status = 1;
+        MapStory.Config.setBgImage(this.getStatusButton(), 'url(resources/images/wait2.gif)');
         var mapCtrl = MapStory.app.getController('Map');
         mapCtrl.requestNearestAudio(this);
     },
@@ -225,10 +133,8 @@ Ext.define('MapStory.controller.Audio',{
     // map 返回当前可用的mp3，响应audio.如果不达要求，audio可以再次提出请求
     setNextSong: function(data, idx){
 
-        b = idx;
-        k = data; 
-
         console.debug('setNextSong');
+        var self = this;
 
         if (data.datas[idx]._id == this.getCurrentAudio().id){ // 无效的返回，重新申请
             return false;
@@ -241,7 +147,8 @@ Ext.define('MapStory.controller.Audio',{
             next.url = MapStory.Config.getWebsite()+content.mp3+'.mp3';
             next.title = content.title;
             next.duration = content.alength;
-            
+            MapStory.Config.setBgImage(this.getStatusButton(), 'none');
+
             // 如果这个时候播放器已经停止，则重启播放器
             if (this.getCurrentAudio().isPlaying == this.STAT_STOP){
                 console.debug('restart player');
@@ -257,13 +164,38 @@ Ext.define('MapStory.controller.Audio',{
         }
     },
 
-    helper:{
+    onStopped: function(caller){
+
+        caller.getSlider().setFlex(10000);
+        clearInterval(caller.getTimer());
+        caller.getPlayer().stop();
+        caller.getCurrentAudio().isPlaying = caller.STAT_STOP;
+        
+        if (caller.getNextAudio().status == 2){
+            caller.playAndStop();
+        } else{
+            caller.getPlayer().stop();
+            //TO-DO：提示当前没有可用的新广播
+            console.debug('nan');
+            if (caller.getNextAudio().status != 1){
+                caller.requestNewCore();
+            }
+        }
+    },
+
+    helpers:{
+
         copySettings: function(target, source){
             target.url = source.url;
             target.duration = source.duration;
             target.id = source.id;
             target.title = source.title;
             target.location = source.location;
+        },
+
+        convert: function(value){
+            if (value >= 1.0) return 10000;
+            else return value / (1-value);
         }
     }
 });

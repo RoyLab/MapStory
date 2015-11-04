@@ -3,30 +3,36 @@ Ext.define('MapStory.view.Main', {
     xtype: 'main',
     requires: [
         'Ext.TitleBar',
-        'MapStory.view.MiniPlayer'
+        'MapStory.view.MiniPlayer',
+        'Ext.Menu'
     ],
     config: {
 
         navigationBar: {
 
             items: [
-                {
-                    xtype: 'button',
-                    id: 'listButton',
-                    align:'right',
-                    iconCls: 'list',
-                    ui: 'plain',
-                    handler: function(){
-                        if(Ext.Viewport.getMenus().right.isHidden()){
-                            Ext.Viewport.showMenu('right');
-                        }
-                        else
-                        {
-                            Ext.Viewport.hideMenu('right');
-                        }
+            {
+                xtype:'button',
+                id: '_main_statusButton',
+                //align:'left',
+                width:40,
+            },
+            {
+                xtype: 'button',
+                id: 'listButton',
+                align:'right',
+                iconCls: 'list',
+                ui: 'plain',
+                handler: function(){
+                    if(Ext.Viewport.getMenus().right.isHidden()){
+                        Ext.Viewport.showMenu('right');
                     }
-                },
-            ]
+                    else
+                    {
+                        Ext.Viewport.hideMenu('right');
+                    }
+                }
+            }]
         },
 
         id:'mainview',
@@ -40,17 +46,18 @@ Ext.define('MapStory.view.Main', {
             },
 
             items: [
-            {
+            /*{
                 xtype:'button',
                 //ui:'normal',
                 id:'refresh_map_button',
                 margin:5,
+                hidden:true,
                 iconCls:'refresh',
-                hideAnimation: Ext.os.is.Android ? false : {
+                hideAnimation:{
                     type: 'fadeOut',
                     duration: 500
                 },
-            },
+            },*/
             {
                 xtype:'container',
                 style:'background:#eee',
@@ -113,5 +120,5 @@ Ext.define('MapStory.view.Main', {
             ]
         });
         return menu;
-    }
+    },
 });

@@ -661,6 +661,10 @@ Ext.ClassManager.addNameAlternateMappings({
   "MapStory.Config": [],
   "MapStory.controller.Audio": [],
   "MapStory.controller.Map": [],
+  "MapStory.controller.nonphone.Audio": [],
+  "MapStory.controller.phone.Audio": [],
+  "MapStory.profile.Nonphone": [],
+  "MapStory.profile.Phone": [],
   "MapStory.view.Main": [],
   "MapStory.view.MiniPlayer": [],
   "MapStory.view.Player": [],
@@ -1385,6 +1389,10 @@ Ext.ClassManager.addNameAliasMappings({
   "MapStory.Config": [],
   "MapStory.controller.Audio": [],
   "MapStory.controller.Map": [],
+  "MapStory.controller.nonphone.Audio": [],
+  "MapStory.controller.phone.Audio": [],
+  "MapStory.profile.Nonphone": [],
+  "MapStory.profile.Phone": [],
   "MapStory.view.Main": [
     "widget.main"
   ],
