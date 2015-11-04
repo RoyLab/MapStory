@@ -53,6 +53,55 @@ Ext.application({
 
         // Initialize the main view
         Ext.Viewport.add(Ext.create('MapStory.view.Main'));
+        Ext.Viewport.setMenu(this.createMenu(),{
+            side: 'left',
+            cover: false
+        });
+
+    },
+
+    createMenu: function(){
+
+        return Ext.create('Ext.Menu', {
+
+            width: 250,
+            scrollable: true,
+            style:'background: url(resources/images/menubg.jpg);\
+                    background-repeat: no-repeat;\
+                    background-position:bottom;',
+            items: [
+                {
+                    xtype: 'button',
+                    text: '搜索视频',
+
+                    handler:function(){
+                        Ext.Viewport.hideMenu('left');
+                        setTimeout(function(){
+                            Ext.getCmp('mainview').push(Ext.create('MapStory.view.Webview'));
+                        }, 500);
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: '意见反馈',
+                },
+                {
+                    xtype: 'button',
+                    text: '帮助',
+                },
+                {
+                    xtype: 'togglefield',
+                    label: '模拟地点',
+                    labelWidth:'60%',
+                    value: 1,
+                    listeners:{
+                        change:function(){
+                            MapStory.app.getController('Map').helpers.isSimLocation = (this.getValue())?true:false;
+                        }
+                    }
+                }
+            ]
+        });
     },
 
     onUpdated: function() {

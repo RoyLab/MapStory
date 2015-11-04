@@ -667,7 +667,8 @@ Ext.ClassManager.addNameAlternateMappings({
   "MapStory.profile.Phone": [],
   "MapStory.view.Main": [],
   "MapStory.view.MiniPlayer": [],
-  "MapStory.view.Player": []
+  "MapStory.view.Player": [],
+  "MapStory.view.Webview": []
 });
 
 Ext.ClassManager.addNameAliasMappings({
@@ -1400,6 +1401,9 @@ Ext.ClassManager.addNameAliasMappings({
   ],
   "MapStory.view.Player": [
     "widget.main"
+  ],
+  "MapStory.view.Webview": [
+    "widget.webview"
   ]
 });
 

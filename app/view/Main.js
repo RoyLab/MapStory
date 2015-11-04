@@ -7,39 +7,65 @@ Ext.define('MapStory.view.Main', {
         'Ext.Menu'
     ],
     config: {
-        showAnimation:'slide',
-        navigationBar: {
-
-            items: [
-            {
-                xtype:'button',
-                id: '_main_statusButton',
-                iconCls:'refresh',
-                width:40,
-            },
-            {
-                xtype: 'button',
-                id: 'listButton',
-                align:'right',
-                iconCls: 'list',
-                ui: 'plain',
-                handler: function(){
-                    if(Ext.Viewport.getMenus().right.isHidden()){
-                        Ext.Viewport.showMenu('right');
-                    }
-                    else
-                    {
-                        Ext.Viewport.hideMenu('right');
-                    }
-                }
-            }]
-        },
 
         id:'mainview',
 
+        listeners:{
+            activeitemchange:function(self, item){
+                if (item.getId()=='homepage'){
+                    setTimeout(function(){
+                        Ext.getCmp('listButton').show();
+                        Ext.getCmp('_main_statusButton').show();
+                    },300);
+                } else {
+                    Ext.getCmp('listButton').hide();
+                    Ext.getCmp('_main_statusButton').hide();
+                }
+            }
+        },
+
+        layout:{
+            type:'card',
+            animation:{
+                duration:300,
+                type:'slide'
+            }
+        },
+        
+        navigationBar: {
+
+            backButton: {
+                // Back button configuration
+            },
+
+            items: [
+            {
+                xtype: 'button',
+                id: 'listButton',
+                iconCls: 'list',
+                ui: 'plain',
+                handler: function(){
+                    if(Ext.Viewport.getMenus().left.isHidden()){
+                        Ext.Viewport.showMenu('left');
+                    }
+                    else
+                    {
+                        Ext.Viewport.hideMenu('left');
+                    }
+                }
+            },
+            {
+                xtype:'button',
+                id: '_main_statusButton',
+                align:'right',
+                width:40,
+            }]
+        },
 
         items:[{
             title:'地图故事：交大2015',
+            id:'homepage',
+
             layout: {
                 type: 'vbox',
                 align:'center'
@@ -72,53 +98,8 @@ Ext.define('MapStory.view.Main', {
     },
 
     /*initialize: function(){
-        Ext.Viewport.setMenu(this.createMenu(),{
-            side: 'right',
-            reveal: true
-        });
+
+ 
     },*/
  
-    /*createMenu: function(){
-
-        var self = this;
-
-        var menu = Ext.create('Ext.Menu', {
-            width: 250,
-            scrollable: false,
-            style:'background: url(resources/images/menubg.jpg);\
-                    background-repeat: no-repeat;\
-                    background-position:bottom;',
-            items: [
-                {
-                    xtype: 'button',
-                    text: '搜索视频',
-
-                    handler:function(){
-                        Ext.Viewport.hideMenu('right');
-                        Ext.getCmp('mainview').push(Ext.create('MapStory.view.test'));
-                    }
-                },
-                {
-                    xtype: 'button',
-                    text: '意见反馈',
-                },
-                {
-                    xtype: 'button',
-                    text: '帮助',
-                },
-                {
-                    xtype: 'togglefield',
-                    label: '模拟地点',
-                    labelWidth:'60%',
-                    value: 1,
-                    listeners:{
-                        change:function(){
-                            MapStory.app.getController('Map').helpers.isSimLocation = (this.getValue())?true:false;
-                        }
-                    }
-                }
-            ]
-        });
-        return menu;
-    }*/
 });
