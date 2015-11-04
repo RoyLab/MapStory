@@ -94,14 +94,21 @@ Ext.define('MapStory.view.Main', {
         var menu = Ext.create('Ext.Menu', {
             width: 250,
             scrollable: 'vertical',
+            style:'background: url(resources/images/menubg.jpg);\
+                    background-repeat: no-repeat;\
+                    background-position:bottom;',
             items: [
                 {
                     xtype: 'button',
-                    text: 'Option 1',
+                    text: '搜索视频',
                 },
                 {
                     xtype: 'button',
-                    text: 'Option 2',
+                    text: '意见反馈',
+                },
+                {
+                    xtype: 'button',
+                    text: '帮助',
                 }
             ]
         });

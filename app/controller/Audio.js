@@ -131,6 +131,7 @@ Ext.define('MapStory.controller.Audio',{
 
             function onMediaStatusChanged(newStatus){
 
+                console.log(newStatus);
                 switch(newStatus){
                 case Media.MEDIA_RUNNING:
                     timer = setInterval(updateSlider, 500);

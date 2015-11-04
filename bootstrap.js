@@ -663,7 +663,8 @@ Ext.ClassManager.addNameAlternateMappings({
   "MapStory.controller.Map": [],
   "MapStory.view.Main": [],
   "MapStory.view.MiniPlayer": [],
-  "MapStory.view.Player": []
+  "MapStory.view.Player": [],
+  "MapStory.view.SlideMenu": []
 });
 
 Ext.ClassManager.addNameAliasMappings({
@@ -1391,6 +1392,9 @@ Ext.ClassManager.addNameAliasMappings({
     "widget.miniplayer"
   ],
   "MapStory.view.Player": [
+    "widget.main"
+  ],
+  "MapStory.view.SlideMenu": [
     "widget.main"
   ]
 });

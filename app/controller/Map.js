@@ -54,7 +54,7 @@ Ext.define('MapStory.controller.Map',{
                 setInterval(function(){
                     caller.helper.loadjs("http://webapi.amap.com/maps?v=1.3&key=c66c95a7afc6d74979632a589b5b656e", 
                         function(param){
-                            caller.launch(app);
+                            caller.launch(param);
                         }, app);
                     }, 2000));
             return;
@@ -260,7 +260,7 @@ Ext.define('MapStory.controller.Map',{
     },
 
 	
-	helpler:{
+	helper:{
 
         loadjs: function(script_filename, callback, param) {
         
