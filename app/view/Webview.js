@@ -4,7 +4,7 @@ Ext.define('MapStory.view.Webview', {
     xtype: 'webview',
 
     config: {
-        url : 'http://sina.cn/',
+        url : 'http://v.qq.com/page/k/y/j/k0165qnodjy.html',
         title:'附近的视频',
 
     },
