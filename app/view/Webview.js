@@ -21,7 +21,6 @@ Ext.define('MapStory.view.Webview', {
         comp.setAttribute('width', '100%');
         comp.setAttribute('height', '100%');
 
-        k = this;
         var elem = document.getElementById(this.getId());
         //elem.removeChild(elem.childNodes[0]);
         elem.appendChild(comp);

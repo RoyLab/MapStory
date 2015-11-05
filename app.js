@@ -15,12 +15,14 @@ Ext.application({
 
     requires: [
         'Ext.MessageBox',
-        'MapStory.Config'
+        'MapStory.Config',
+        'Ext.field.Toggle'
     ],
 
     views: [
         'Main',
-        'Player'
+        'Player',
+        'Webview'
     ],
 
     controllers:[

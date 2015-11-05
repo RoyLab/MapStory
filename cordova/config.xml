@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.domain.MapStory" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>MapStory</name>
+    <name>地图故事</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
     </description>
@@ -9,6 +9,8 @@
     </author>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" version="1" />
+    <preference name="SplashScreen" value="screen"/>
+    <preference name="SplashMaintainAspectRatio" value="true" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -17,6 +19,8 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     <platform name="android">
+        <icon src="/www/resources/images/icon.png"/>
+        <splash src="/www/resources/images/splash.png"/>
         <allow-intent href="market:*" />
     </platform>
     <platform name="ios">

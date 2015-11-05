@@ -35,8 +35,8 @@ Ext.define('MapStory.controller.Audio',{
         },
 
         nextAudio:{
-            url:MapStory.Config.getResourcePrefix()+'mp3/welcome.ogg',
-            duration:3,
+            url:MapStory.Config.getResourcePrefix()+'mp3/welcome.mp3',
+            duration:14,
             id:-1,
             title:'关于地图故事',
             location:'上海交通大学',
@@ -61,14 +61,14 @@ Ext.define('MapStory.controller.Audio',{
         var self = this;
 
         if (item.getId()=='homepage'){
-            if (self.getCurrentAudio().isPlaying == self.STAT_PLAYING)
+            if (self.getCurrentAudio().isPlaying == self.STAT_PAUSE)
                 self.resume();
             setTimeout(function(){
                 Ext.getCmp('listButton').show();
                 Ext.getCmp('_main_statusButton').show();
             },300);
         } else {
-            if (self.getCurrentAudio().isPlaying == self.STAT_PAUSE)
+            if (self.getCurrentAudio().isPlaying == self.STAT_PLAYING)
                 self.pause();
             Ext.getCmp('listButton').hide();
             Ext.getCmp('_main_statusButton').hide();

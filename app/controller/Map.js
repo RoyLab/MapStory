@@ -248,7 +248,7 @@ Ext.define('MapStory.controller.Map',{
 
         var caller = this;
 
-        if (caller.getSearchPlugin()){
+        if (caller.getSearchPlugin() && caller.getGeoResult()){
 
             caller.getSearchPlugin().searchNearBy(caller.getGeoResult().position, 500, 
                 function(status, result) {
